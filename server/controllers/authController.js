@@ -39,6 +39,16 @@ const createSendToken = (data, res, next, user, message) => {
   );
 };
 
+const extractId = (token) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, id) => {
+      if (err) reject(new AppError('Cookie is expired', 401));
+
+      resolve(id);
+    });
+  });
+};
+
 const signup = catchAsync(async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
 
@@ -91,4 +101,22 @@ const login = catchAsync(async (req, res, next) => {
   );
 });
 
-export { signup, login };
+const protectRoute = catchAsync(async (req, res, next) => {
+  const cookie = req.cookies;
+  let id;
+  try {
+    id = await extractId(cookie);
+
+    const user = await User.findById(id);
+
+    if (!user) next(new AppError("This user doesn't exist", 401));
+
+    req.user = user;
+
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+export { signup, login, protectRoute };
