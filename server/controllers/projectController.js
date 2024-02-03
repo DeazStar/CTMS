@@ -19,4 +19,20 @@ const createProject = catchAsync(async (req, res, next) => {
   });
 });
 
-export { createProject };
+const listProject = catchAsync(async (req, res, next) => {
+  const user = req.user;
+
+  const project = await Project.find({ admin: user._id }).populate({
+    path: 'admin',
+    select: 'fistName lastName email',
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      project,
+    },
+  });
+});
+
+export { createProject, listProject };

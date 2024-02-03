@@ -22,8 +22,8 @@ const projectSchema = mongoose.Schema({
   },
 });
 
-projectSchema.pre('/^find/', function (next) {
-  this.populate({
+projectSchema.pre('/^find/', async function (next) {
+  await this.populate({
     path: 'admin',
     select: 'firstName lastName email',
   });
