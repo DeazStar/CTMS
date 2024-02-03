@@ -62,4 +62,23 @@ const editProject = catchAsync(async (req, res, next) => {
   });
 });
 
-export { createProject, listProject, editProject };
+const deleteProject = catchAsync(async (req, res, next) => {
+  const user = req.user;
+
+  let project = await Project.findById(req.params.id);
+
+  if (user._id.toString() !== project.admin.toString())
+    return next(
+      new AppError('Only admin of the project can delete the project', 403),
+    );
+
+  await Project.findByIdAndDelete(req.params.id);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'project deleted sucessfully',
+    data: null,
+  });
+});
+
+export { createProject, listProject, editProject, deleteProject };
