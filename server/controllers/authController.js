@@ -41,10 +41,10 @@ const createSendToken = (data, res, next, user, message) => {
 
 const extractId = (token) => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, process.env.JWT_SECRET, (err, id) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
       if (err) reject(new AppError('Cookie is expired', 401));
 
-      resolve(id);
+      resolve(data.id);
     });
   });
 };
@@ -103,9 +103,10 @@ const login = catchAsync(async (req, res, next) => {
 
 const protectRoute = catchAsync(async (req, res, next) => {
   const cookie = req.cookies;
+
   let id;
   try {
-    id = await extractId(cookie);
+    id = await extractId(cookie.authCookie);
 
     const user = await User.findById(id);
 
