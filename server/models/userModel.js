@@ -45,7 +45,7 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.checkPassword = async function (PlainPassword) {
   try {
-    const result = await bcrypt.hash(PlainPassword, this.password);
+    const result = await bcrypt.compare(PlainPassword, this.password);
     return result;
   } catch (err) {
     next(new AppError("Can't compare passwords", 500));

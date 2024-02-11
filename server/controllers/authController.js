@@ -3,7 +3,7 @@ import catchAsync from '../errors/catchAsync.js';
 import AppError from '../errors/AppError.js';
 import User from '../models/userModel.js';
 
-const createSendToken = (data, res, next, user, message) => {
+const createSendToken = (data, res, next, user, message, statusCode) => {
   let cookieOption = {};
   jwt.sign(
     data,
@@ -28,7 +28,7 @@ const createSendToken = (data, res, next, user, message) => {
         };
       }
       res.cookie('authCookie', token, cookieOption);
-      res.status(200).json({
+      res.status(statusCode).json({
         status: 'success',
         message: message,
         data: {
@@ -76,6 +76,7 @@ const signup = catchAsync(async (req, res, next) => {
     next,
     sanitizedData,
     'successful signup',
+    201,
   );
 });
 
@@ -83,8 +84,9 @@ const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
+  const check = await user?.checkPassword(password);
 
-  if (!user || !user?.checkPassword(password))
+  if (!user || !check)
     return next(new AppError('wrong email or password', 401));
 
   const sanitizedData = user.toObject();
@@ -98,6 +100,7 @@ const login = catchAsync(async (req, res, next) => {
     next,
     sanitizedData,
     'successful login',
+    200,
   );
 });
 
