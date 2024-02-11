@@ -72,6 +72,7 @@ const editProject = catchAsync(async (req, res, next) => {
     );
 
   project.projectName = projectName;
+  project.updatedAt = new Date();
 
   project.save();
 
