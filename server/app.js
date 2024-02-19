@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import userRoute from './routes/userRoutes.js';
 import projectRoute from './routes/projectRoutes.js';
+import invetationRoute from './routes/invetationRoutes.js';
 import generalError from './errors/errorHandler.js';
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(morgan('dev'));
 
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/projects', projectRoute);
+app.use('/api/v1/invetations', invetationRoute);
 
 app.use(generalError);
 
