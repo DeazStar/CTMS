@@ -74,7 +74,7 @@ const editProject = catchAsync(async (req, res, next) => {
   project.projectName = projectName;
   project.updatedAt = new Date();
 
-  project.save();
+  project = await Project.findByIdAndUpdate(project._id, project);
 
   const projectFiltered = project.toObject();
 

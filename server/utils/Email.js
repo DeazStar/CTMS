@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 import { convert } from 'html-to-text';
 import pug from 'pug';
 
-export class Email {
+export default class Email {
   constructor(obj) {
     this.from = process.env.EMAIL;
     this.to = obj.to;
@@ -13,7 +13,7 @@ export class Email {
   }
 
   createTransporter() {
-    if (process.env.NODE_EVN === 'development') {
+    if (process.env.NODE_ENV === 'dev') {
       return nodemailer.createTransport({
         host: process.env.DEV_HOST,
         port: process.env.DEV_PORT,
@@ -38,10 +38,11 @@ export class Email {
 
   async sendInvetation(inviter, project) {
     const html = pug.renderFile(
-      `${__dirname}/../views/emails/invetationEmail.pug`,
+      `${process.cwd()}/views/emails/invetationEmail.pug`,
       {
         subject: 'Invetation to CTMS project',
         to: this.to,
+        url: this.url,
         inviter: inviter,
         project: project,
       },
