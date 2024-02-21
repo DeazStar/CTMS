@@ -47,7 +47,7 @@ const sendInvetation = catchAsync(async (req, res, next) => {
 
   if (invetation) {
     res.status(200).json({
-      status: 'successful',
+      status: 'success',
       message: 'Invetation have been resent',
     });
 
@@ -67,4 +67,38 @@ const sendInvetation = catchAsync(async (req, res, next) => {
   });
 });
 
-export { sendInvetation };
+const acceptInvetation = catchAsync(async (req, res, next) => {
+  const user = req.user;
+  const { invetationToken } = req.params;
+  let projectId;
+
+  try {
+    const project = jwt.verify(invetationToken, process.env.JWT_SECRET);
+    projectId = project.projectId;
+  } catch (err) {
+    return next(new AppError('invalid token', 401));
+  }
+
+  if (!projectId) return next(new AppError('invalid token', 401));
+
+  const invetationStat = await Invetation.findOneAndUpdate(
+    { invitee: user.email, project: projectId },
+    { invetationStatus: 'accepted' },
+  );
+
+  if (!invetationStat)
+    return next(new AppError(404, 'This person was not invited'));
+
+  await UserProject.create({
+    user: user._id,
+    role: 'team_memeber',
+    project: projectId,
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: `${user.email} is added to the project`,
+  });
+});
+
+export { sendInvetation, acceptInvetation };
