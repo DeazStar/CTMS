@@ -25,7 +25,7 @@ const createProject = catchAsync(async (req, res, next) => {
     status: 'success',
     message: 'project created sucessfully',
     data: {
-      userProjectFiltred,
+      projects: userProjectFiltred,
     },
   });
 });
@@ -47,7 +47,7 @@ const listProject = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      userProject,
+      projects: userProject,
     },
   });
 });
@@ -84,7 +84,7 @@ const editProject = catchAsync(async (req, res, next) => {
     status: 'success',
     message: 'project updated sucessfully',
     data: {
-      projectFiltered,
+      projects: projectFiltered,
     },
   });
 });
