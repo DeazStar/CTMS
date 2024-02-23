@@ -27,7 +27,10 @@ const createTask = catchAsync(async (req, res, next) => {
   const { taskName, taskDescription, dueDate } = req.body;
   const { projectId } = req.params;
 
-  // add do date TODO
+  if (dueDate) {
+    dueDate = new Date(dueDate);
+  }
+
   const isAllowed = await checkUserRole(user._id, projectId);
 
   if (!isAllowed)
@@ -54,10 +57,8 @@ const createTask = catchAsync(async (req, res, next) => {
 });
 
 const listTask = catchAsync(async (req, res, next) => {
-  //const user = req.user;
   const { projectId } = req.params;
 
-  // retrive the assigned tasks as well TODO
   const tasks = await Task.find({ project: projectId }).select('-__v');
 
   res.status(200).json({
@@ -68,16 +69,35 @@ const listTask = catchAsync(async (req, res, next) => {
   });
 });
 
+const getAssgiendTask = catchAsync(async (req, res, next) => {
+  const { taskId } = req.params;
+
+  const assignedTask = await UserTask.find({ task: taskId });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      assignedTask,
+    },
+  });
+});
+
 const getTaskById = catchAsync(async (req, res, next) => {
-  //retrive assigned tasks as well TODO
   const { taskId } = req.params;
 
   const task = await Task.findById(taskId).select('-__v');
+
+  const assignedTo = await UserTask.find({ task: taskId })
+    .select('user')
+    .populate({
+      path: 'user',
+    });
 
   res.status(200).json({
     status: 'success',
     data: {
       task,
+      assignedTo,
     },
   });
 });
@@ -96,7 +116,9 @@ const editTask = catchAsync(async (req, res, next) => {
 
   if (!task) return next(new AppError('Task not found', 404));
 
-  // do due date TODO
+  if (dueDate) {
+    dueDate = new Date(dueDate);
+  }
 
   task.taskName = taskName;
   task.taskDescription = taskDescription;
@@ -131,9 +153,8 @@ const deleteTask = catchAsync(async (req, res, next) => {
   if (!isAllowed)
     return next(new AppError('Only Admin and Managers can delete tasks', 401));
 
+  await UserTask.deleteMany({ task: taskId });
   await Task.findByIdAndDelete(taskId);
-
-  // delte all assigned tasks from UserTask Model //TODO
 
   res.status(200).json({
     status: 'success',
@@ -177,4 +198,12 @@ const assignTask = catchAsync(async (req, res, next) => {
   }
 });
 
-export { createTask, listTask, editTask, deleteTask, getTaskById, assignTask };
+export {
+  createTask,
+  listTask,
+  editTask,
+  deleteTask,
+  getTaskById,
+  assignTask,
+  getAssgiendTask,
+};
