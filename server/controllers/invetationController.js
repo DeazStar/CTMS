@@ -23,9 +23,14 @@ const sendInvetation = catchAsync(async (req, res, next) => {
     user: user._id,
   });
 
-  if (userProject.role !== 'admin' || userProject.role !== 'manager')
+  console.log(userProject.role);
+
+  if (userProject.role !== 'admin' && userProject.role !== 'manager')
     return next(
-      new App('Only admins and managers can invite user to this project', 401),
+      new AppError(
+        'Only admins and managers can invite user to this project',
+        401,
+      ),
     );
 
   const token = jwt.sign({ projectId: project._id }, process.env.JWT_SECRET);

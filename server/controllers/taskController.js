@@ -111,7 +111,7 @@ const getTaskById = catchAsync(async (req, res, next) => {
 const editTask = catchAsync(async (req, res, next) => {
   const user = req.user;
   const { taskId, projectId } = req.params;
-  const { taskName, taskDescription, dueDate } = req.body;
+  let { taskName, taskDescription, dueDate } = req.body;
 
   const isAllowed = await checkUserRole(user._id, projectId);
 

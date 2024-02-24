@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const notificationSchema = mongoose.Schema({
-  user: {
+  project: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
