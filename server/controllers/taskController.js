@@ -1,8 +1,10 @@
 import Task from '../models/taskModel.js';
 import UserProject from '../models/userProjectModel.js';
 import UserTask from '../models/userTaskModel.js';
+import Notification from '../models/notificationModel.js';
 import AppError from '../errors/AppError.js';
 import catchAsync from '../errors/catchAsync.js';
+import { setReminder } from './reminderController.js';
 
 const checkUserRole = async (userId, projectId) => {
   let userProject;
@@ -24,7 +26,7 @@ const checkUserRole = async (userId, projectId) => {
 
 const createTask = catchAsync(async (req, res, next) => {
   const user = req.user;
-  const { taskName, taskDescription, dueDate } = req.body;
+  let { taskName, taskDescription, dueDate } = req.body;
   const { projectId } = req.params;
 
   if (dueDate) {
@@ -42,6 +44,10 @@ const createTask = catchAsync(async (req, res, next) => {
     taskDescription,
     dueDate,
   });
+
+  if (dueDate && dueDate instanceof Date) {
+    await setReminder(dueDate, task._id);
+  }
 
   const taskFiltred = task.toObject();
 
@@ -118,6 +124,10 @@ const editTask = catchAsync(async (req, res, next) => {
 
   if (dueDate) {
     dueDate = new Date(dueDate);
+  }
+
+  if (dueDate && dueDate instanceof Date) {
+    await setReminder(dueDate, task._id);
   }
 
   task.taskName = taskName;
