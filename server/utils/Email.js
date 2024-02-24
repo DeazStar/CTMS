@@ -36,28 +36,52 @@ export default class Email {
     }
   }
 
-  async sendInvetation(inviter, project) {
-    const html = pug.renderFile(
-      `${process.cwd()}/views/emails/invetationEmail.pug`,
-      {
-        subject: 'Invetation to CTMS project',
+  async send(subject, template, optionOne, optionTwo = null) {
+    let html;
+    if (!optionTwo) {
+      html = pug.renderFile(`${process.cwd()}/views/emails/${template}.pug`, {
+        subject: subject,
         to: this.to,
         url: this.url,
-        inviter: inviter,
-        project: project,
-      },
-    );
+        task: optionOne,
+      });
+    } else {
+      console.log('am here');
+      html = pug.renderFile(`${process.cwd()}/views/emails/${template}.pug`, {
+        subject: subject,
+        to: this.to,
+        url: this.url,
+        inviter: optionOne,
+        project: optionTwo,
+      });
+    }
 
     const text = convert(html);
 
     const mailOption = {
       from: this.from,
       to: this.to,
-      subject: 'Invetation to CTMS project',
+      subject: subject,
       text: text,
       html: html,
     };
 
-    await this.createTransporter().sendMail(mailOption);
+    try {
+      await this.createTransporter().sendMail(mailOption);
+
+      console.log('Done sending email');
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async sendInvetation(inviter, project) {
+    const subject = 'Project Invetation';
+    await this.send(subject, 'invetationEmail', inviter, project);
+  }
+
+  async sendReminder(task) {
+    const subject = `Reminder for ${task}`;
+    await this.send(subject, 'reminderEmail', task);
   }
 }
