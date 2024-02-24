@@ -1,8 +1,10 @@
+import ReminderService from './ReminderService.js';
 import Subscribe from './Subscriber.js';
 
 export default function RedisExpiredEvents() {
   const { REDIS_DB } = process.env;
   const reminder = new Subscribe();
+  const reminderService = new ReminderService();
 
   reminder.subscribe(`__keyevent@${REDIS_DB}__:expired`);
   console.log('Subscribe to an event');
@@ -12,7 +14,7 @@ export default function RedisExpiredEvents() {
     console.log('sdkfjlkdsfjdksf');
     switch (type) {
       case 'reminder': {
-        const taskId = await reminder.get(key);
+        const taskId = reminderService.get(taskId);
         console.log('sending email');
         //TODO:
       }
