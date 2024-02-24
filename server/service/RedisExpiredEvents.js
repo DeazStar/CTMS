@@ -1,9 +1,10 @@
 import Subscribe from './Subscriber.js';
 
 export default function RedisExpiredEvents() {
+  const { REDIS_DB } = process.env;
   const reminder = new Subscribe();
 
-  reminder.subscribe('__keyevent@0__:expired');
+  reminder.subscribe(`__keyevent@${REDIS_DB}__:expired`);
   console.log('Subscribe to an event');
 
   reminder.listen('message', async (channel, message) => {
