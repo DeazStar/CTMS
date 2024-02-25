@@ -22,6 +22,10 @@ const userSchema = mongoose.Schema({
     require: [true, 'Password is required'],
     minlength: [8, 'The password length should be more than 8 characters'],
   },
+  profile: {
+    type: String,
+    default: '/server/public/user/default.png',
+  },
   createdAt: {
     type: Date,
     default: new Date(),
