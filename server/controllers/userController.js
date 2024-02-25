@@ -53,7 +53,7 @@ const updatePassword = catchAsync(async (req, res, next) => {
 const updateAvatar = catchAsync(async (req, res, next) => {
   if (!req.file) return next(new AppError('File must exist', 400));
 
-  const path = `/server/public/user/${req.filename}`;
+  const path = `/server/public/user/${req.file.filename}`;
   await User.findByIdAndUpdate(req.user._id, {
     profile: path,
   });
