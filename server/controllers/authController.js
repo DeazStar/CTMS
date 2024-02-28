@@ -21,6 +21,7 @@ const createSendToken = (data, res, next, user, message, statusCode) => {
           secure: false,
         };
       } else if (process.env.NODE_ENV === 'prod') {
+        console.log('cookie is secured');
         cookieOption = {
           expires: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
           httpOnly: true,
